@@ -1,0 +1,26 @@
+<div class="dashboard-container">
+  <mat-card class="dashboard-card">
+    <mat-card-header>
+      <div mat-card-avatar class="header-image">
+        <mat-icon>account_circle</mat-icon>
+      </div>
+      <mat-card-title>Welcome to the Dashboard</mat-card-title>
+      <mat-card-subtitle *ngIf="currentUser">{{ currentUser.email }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>You have successfully logged in to the system.</p>
+      <p>This is a protected area that requires authentication.</p>
+      <p>The authentication system supports:</p>
+      <ul>
+        <li>Email/Password login</li>
+        <li>Fingerprint authentication</li>
+      </ul>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="warn" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        Logout
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
