@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 // Environment URL - would typically be in an environment file
 const API_URL = 'http://localhost:3000';
@@ -36,9 +37,19 @@ export interface AuthResponse {
 export class AuthService {
   private readonly currentUserSubject: BehaviorSubject<User | null>;
   public readonly currentUser$: Observable<User | null>;
+  private isBrowser: boolean;
 
-  constructor(private http: HttpClient) {
-    const storedUser = localStorage.getItem('currentUser');
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+    
+    let storedUser = null;
+    if (this.isBrowser) {
+      storedUser = localStorage.getItem('currentUser');
+    }
+    
     this.currentUserSubject = new BehaviorSubject<User | null>(
       storedUser ? JSON.parse(storedUser) : null
     );
@@ -61,9 +72,11 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${API_URL}/auth/login`, { email, password })
       .pipe(
         tap(response => {
-          // Save user to local storage and update current user subject
-          localStorage.setItem('currentUser', JSON.stringify(response.user));
-          localStorage.setItem('token', response.access_token);
+          if (this.isBrowser) {
+            // Save user to local storage and update current user subject
+            localStorage.setItem('currentUser', JSON.stringify(response.user));
+            localStorage.setItem('token', response.access_token);
+          }
           this.currentUserSubject.next(response.user);
         })
       );
@@ -77,9 +90,11 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${API_URL}/auth/login/fingerprint`, { fingerprintHash })
       .pipe(
         tap(response => {
-          // Save user to local storage and update current user subject
-          localStorage.setItem('currentUser', JSON.stringify(response.user));
-          localStorage.setItem('token', response.access_token);
+          if (this.isBrowser) {
+            // Save user to local storage and update current user subject
+            localStorage.setItem('currentUser', JSON.stringify(response.user));
+            localStorage.setItem('token', response.access_token);
+          }
           this.currentUserSubject.next(response.user);
         })
       );
@@ -111,9 +126,11 @@ export class AuthService {
    * Logout the current user
    */
   logout() {
-    // Remove user from local storage and update current user subject
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('token');
+    if (this.isBrowser) {
+      // Remove user from local storage and update current user subject
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('token');
+    }
     this.currentUserSubject.next(null);
   }
 }
