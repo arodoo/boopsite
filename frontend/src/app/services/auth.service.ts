@@ -45,7 +45,7 @@ export class AuthService {
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
     
-    let storedUser = null;
+    let storedUser: string | null = null;
     if (this.isBrowser) {
       storedUser = localStorage.getItem('currentUser');
     }
