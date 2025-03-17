@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
@@ -7,6 +7,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { User, UserRole } from '../../../models/user.model';
+
+interface DialogData {
+  user?: User;
+}
 
 @Component({
   selector: 'app-user-form-dialog',
@@ -23,40 +27,52 @@ import { User, UserRole } from '../../../models/user.model';
     MatSelectModule
   ]
 })
-export class UserFormDialogComponent {
-  userForm: FormGroup;
-  roles = Object.values(UserRole);
-  isEditMode: boolean;
+export class UserFormDialogComponent implements OnInit {
+  userForm!: FormGroup;
+  roles = [UserRole.USER, UserRole.ADMIN];
+  isEditMode: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<UserFormDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: User | null
+    @Inject(MAT_DIALOG_DATA) public data: DialogData
   ) {
-    this.isEditMode = !!data;
-    
+    this.isEditMode = !!this.data?.user;
+    this.initForm();
+  }
+
+  private initForm(): void {
     this.userForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      role: [UserRole.USER, Validators.required],
-      password: ['', this.isEditMode ? [] : [Validators.required, Validators.minLength(6)]]
+      password: ['', this.isEditMode ? [] : [Validators.required, Validators.minLength(6)]],
+      firstName: ['', [Validators.required]],
+      lastName: ['', [Validators.required]],
+      role: [this.isEditMode && this.data.user ? this.data.user.role : UserRole.USER]
     });
 
-    if (this.isEditMode && data) {
+    if (this.isEditMode && this.data.user) {
       this.userForm.patchValue({
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: data.role
+        email: this.data.user.email,
+        firstName: this.data.user.firstName,
+        lastName: this.data.user.lastName
+      });
+    }
+  }
+
+  ngOnInit() {
+    if (this.data?.user) {
+      this.userForm.patchValue({
+        email: this.data.user.email,
+        firstName: this.data.user.firstName,
+        lastName: this.data.user.lastName,
+        role: this.data.user.role
       });
     }
   }
 
   onSubmit(): void {
     if (this.userForm.valid) {
-      const formData = this.userForm.value;
-      // Only include password in the data if it's provided in edit mode
+      const formData = { ...this.userForm.value };
       if (this.isEditMode && !formData.password) {
         delete formData.password;
       }

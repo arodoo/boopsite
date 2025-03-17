@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 
@@ -97,6 +97,25 @@ export class UsersService {
     
     user.fingerprintHash = fingerprintHash;
     return this.usersRepository.save(user);
+  }
+
+  async ensureAdminUser(): Promise<void> {
+    const adminEmail = 'admin@example.com';
+    const adminPassword = 'admin123';
+
+    const existingAdmin = await this.findByEmail(adminEmail);
+    if (!existingAdmin) {
+      await this.create({
+        email: adminEmail,
+        password: adminPassword,
+        role: UserRole.ADMIN,
+        firstName: 'Admin',
+        lastName: 'User',
+      });
+      console.log('Admin user created');
+    } else {
+      console.log('Admin user already exists');
+    }
   }
 
   private async hashPassword(password: string): Promise<string> {

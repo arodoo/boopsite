@@ -7,6 +7,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { UsersService } from '../../../services/users.service';
 import { User, UserRole } from '../../../models/user.model';
 import { UserFormDialogComponent } from '../user-form-dialog/user-form-dialog.component';
@@ -28,7 +30,8 @@ import { UserFormDialogComponent } from '../user-form-dialog/user-form-dialog.co
 })
 export class UsersListComponent implements OnInit {
   displayedColumns: string[] = ['email', 'firstName', 'lastName', 'role', 'actions'];
-  dataSource: MatTableDataSource<User>;
+  users: User[] = [];
+  dataSource = new MatTableDataSource<User>([]);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -45,31 +48,54 @@ export class UsersListComponent implements OnInit {
     this.loadUsers();
   }
 
-  loadUsers(): void {
-    this.usersService.getUsers().subscribe({
-      next: (users) => {
+  public loadUsers() {
+    this.usersService.getUsers()
+      .pipe(
+        catchError(error => {
+          this.snackBar.open('Error loading users', 'Close', { duration: 3000 });
+          return of([]);
+        })
+      )
+      .subscribe(users => {
+        this.users = users;
         this.dataSource.data = users;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      },
-      error: (error) => {
-        this.snackBar.open('Error loading users', 'Close', { duration: 3000 });
-      }
-    });
+      });
   }
 
   openUserDialog(user?: User): void {
     const dialogRef = this.dialog.open(UserFormDialogComponent, {
-      width: '500px',
-      data: user
+      width: '400px',
+      data: { user },
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         if (user) {
-          this.updateUser(user.id, result);
+          this.usersService.updateUser(user.id, result).subscribe({
+            next: (updatedUser: User) => {
+              const index = this.users.findIndex((u: User) => u.id === user.id);
+              if (index !== -1) {
+                this.users[index] = updatedUser;
+                this.dataSource.data = [...this.users];
+                this.snackBar.open('User updated successfully', 'Close', { duration: 3000 });
+              }
+            },
+            error: () => {
+              this.snackBar.open('Error updating user', 'Close', { duration: 3000 });
+            }
+          });
         } else {
-          this.createUser(result);
+          this.usersService.createUser(result).subscribe({
+            next: (newUser: User) => {
+              this.users.push(newUser);
+              this.dataSource.data = [...this.users];
+              this.snackBar.open('User created successfully', 'Close', { duration: 3000 });
+            },
+            error: () => {
+              this.snackBar.open('Error creating user', 'Close', { duration: 3000 });
+            }
+          });
         }
       }
     });

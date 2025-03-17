@@ -1,6 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { AuthService, User, AuthResponse } from './auth.service';
+import { AuthService } from './auth.service';
+import { User, UserRole } from '../models/user.model';
+
+interface AuthResponse {
+  access_token: string;
+  user: User;
+}
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -8,7 +14,8 @@ describe('AuthService', () => {
 
   const mockUser: User = {
     id: '1',
-    email: 'test@example.com'
+    email: 'test@example.com',
+    role: UserRole.USER
   };
 
   const mockAuthResponse: AuthResponse = {
@@ -81,19 +88,21 @@ describe('AuthService', () => {
     it('should register new user', () => {
       const email = 'newuser@example.com';
       const password = 'password123';
+      const firstName = 'New';
+      const lastName = 'User';
 
       const mockRegisterResponse = {
         message: 'User registered successfully',
         user: mockUser
       };
 
-      service.register(email, password).subscribe(response => {
+      service.register(email, password, firstName, lastName).subscribe(response => {
         expect(response).toEqual(mockRegisterResponse);
       });
 
       const req = httpMock.expectOne('http://localhost:3000/auth/register');
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({ email, password });
+      expect(req.request.body).toEqual({ email, password, firstName, lastName });
 
       req.flush(mockRegisterResponse);
     });

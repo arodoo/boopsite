@@ -7,6 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { BehaviorSubject } from 'rxjs';
+import { UserRole } from '../../models/user.model';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -18,6 +19,7 @@ describe('DashboardComponent', () => {
   const mockUser = {
     id: '1',
     email: 'test@example.com',
+    role: UserRole.USER
   };
 
   beforeEach(async () => {

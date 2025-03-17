@@ -13,6 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
+import { UserRole } from '../../models/user.model';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -24,6 +25,7 @@ describe('LoginComponent', () => {
   const mockUser = {
     id: '1',
     email: 'test@example.com',
+    role: UserRole.USER
   };
 
   beforeEach(async () => {
@@ -163,6 +165,8 @@ describe('LoginComponent', () => {
         email: 'new@example.com',
         password: 'password123',
         confirmPassword: 'password123',
+        firstName: 'Test',
+        lastName: 'User'
       };
 
       authService.register.and.returnValue(of({
@@ -170,12 +174,14 @@ describe('LoginComponent', () => {
         user: mockUser,
       }));
 
-      component.registerForm.setValue(registerData);
+      component.registerForm.patchValue(registerData);
       component.onRegister();
 
       expect(authService.register).toHaveBeenCalledWith(
         registerData.email,
         registerData.password,
+        registerData.firstName,
+        registerData.lastName
       );
       expect(snackBar.open).toHaveBeenCalledWith(
         'Registration successful! You can now login.',
