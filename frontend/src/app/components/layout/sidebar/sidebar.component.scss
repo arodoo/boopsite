@@ -15,3 +15,30 @@
 mat-nav-list {
   padding-top: 0;
 }
+
+.sidebar-expansion {
+  background: transparent;
+  
+  .mat-expansion-panel-header {
+    padding: 0 16px;
+  }
+
+  .mat-expansion-panel-header-title {
+    mat-icon {
+      margin-right: 16px;
+    }
+  }
+
+  mat-nav-list {
+    padding: 0;
+  }
+
+  a.mat-list-item {
+    padding-left: 32px;
+  }
+}
+
+// Fix expansion panel spacing
+::ng-deep .mat-expansion-panel-body {
+  padding: 0 !important;
+}

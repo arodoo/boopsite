@@ -40,13 +40,20 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { email: validatedUser.email, sub: validatedUser.id };
+    const payload = { 
+      email: validatedUser.email, 
+      sub: validatedUser.id,
+      role: validatedUser.role
+    };
     
     return {
       access_token: this.jwtService.sign(payload),
       user: {
         id: validatedUser.id,
         email: validatedUser.email,
+        role: validatedUser.role,
+        firstName: validatedUser.firstName,
+        lastName: validatedUser.lastName,
       },
     };
   }
@@ -63,13 +70,20 @@ export class AuthService {
       throw new UnauthorizedException('Invalid fingerprint');
     }
     
-    const payload = { email: user.email, sub: user.id };
+    const payload = { 
+      email: user.email, 
+      sub: user.id,
+      role: user.role
+    };
     
     return {
       access_token: this.jwtService.sign(payload),
       user: {
         id: user.id,
         email: user.email,
+        role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName,
       },
     };
   }
@@ -87,6 +101,9 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
+        role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName,
       },
     };
   }

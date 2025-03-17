@@ -49,6 +49,8 @@ describe('AuthController', () => {
     const createUserDto = {
       email: 'test@example.com',
       password: 'password123',
+      firstName: 'Test',  // Add required fields
+      lastName: 'User'    // Add required fields
     };
 
     it('should register a new user successfully', async () => {
