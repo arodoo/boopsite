@@ -1,7 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { LoginUserDto, FingerprintDto } from '../users/dto/user.dto';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -9,6 +11,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
   ) {}
 
   /**
@@ -18,13 +21,34 @@ export class AuthService {
    * @returns User object without password
    */
   async validateUser(email: string, password: string): Promise<any> {
+    this.logger.info('Attempting to validate user', { email });
     const user = await this.usersService.findByEmail(email);
-    
-    if (user && await bcrypt.compare(password, user.password)) {
-      const { password, ...result } = user;
-      return result;
+
+    if (!user) {
+      this.logger.error('User not found during validation', { email });
+      return null;
     }
-    
+
+    try {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      this.logger.info('Password validation result', { 
+        email, 
+        isValid: isPasswordValid,
+        passwordHash: user.password 
+      });
+
+      if (isPasswordValid) {
+        const { password, ...result } = user;
+        return result;
+      }
+    } catch (error) {
+      this.logger.error('Error during password validation', { 
+        email, 
+        error: error.message,
+        stack: error.stack 
+      });
+    }
+
     return null;
   }
 
@@ -34,9 +58,11 @@ export class AuthService {
    * @returns JWT token and user information
    */
   async login(user: LoginUserDto) {
+    this.logger.info('Login attempt', { email: user.email });
     const validatedUser = await this.validateUser(user.email, user.password);
     
     if (!validatedUser) {
+      this.logger.error('Login failed - invalid credentials', { email: user.email });
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -46,6 +72,12 @@ export class AuthService {
       role: validatedUser.role
     };
     
+    this.logger.info('Login successful', { 
+      email: user.email, 
+      userId: validatedUser.id,
+      role: validatedUser.role 
+    });
+
     return {
       access_token: this.jwtService.sign(payload),
       user: {

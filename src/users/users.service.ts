@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, UnauthorizedException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserRole } from './entities/user.entity';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -10,6 +12,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -103,18 +106,43 @@ export class UsersService {
     const adminEmail = 'admin@example.com';
     const adminPassword = 'admin123';
 
+    this.logger.info('Checking for admin user existence', { email: adminEmail });
     const existingAdmin = await this.findByEmail(adminEmail);
+    
     if (!existingAdmin) {
-      await this.create({
-        email: adminEmail,
-        password: adminPassword,
-        role: UserRole.ADMIN,
-        firstName: 'Admin',
-        lastName: 'User',
-      });
-      console.log('Admin user created');
+      this.logger.info('Creating new admin user', { email: adminEmail });
+      try {
+        const hashedPassword = await this.hashPassword(adminPassword);
+        this.logger.debug('Password hashed successfully', { 
+          email: adminEmail,
+          passwordHash: hashedPassword 
+        });
+
+        const newAdmin = await this.create({
+          email: adminEmail,
+          password: adminPassword,
+          role: UserRole.ADMIN,
+          firstName: 'Admin',
+          lastName: 'User',
+        });
+        
+        this.logger.info('Admin user created successfully', { 
+          userId: newAdmin.id,
+          email: newAdmin.email,
+          role: newAdmin.role 
+        });
+      } catch (error) {
+        this.logger.error('Failed to create admin user', { 
+          error: error.message,
+          stack: error.stack 
+        });
+        throw error;
+      }
     } else {
-      console.log('Admin user already exists');
+      this.logger.info('Admin user already exists', { 
+        userId: existingAdmin.id,
+        email: existingAdmin.email 
+      });
     }
   }
 

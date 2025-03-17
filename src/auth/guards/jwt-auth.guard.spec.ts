@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 // Simply mock the AuthGuard class
 jest.mock('@nestjs/passport', () => {
@@ -21,10 +23,21 @@ jest.mock('@nestjs/passport', () => {
 
 describe('JwtAuthGuard', () => {
   let guard: JwtAuthGuard;
+  let reflector: jest.Mocked<Reflector>;
 
   beforeEach(async () => {
+    reflector = {
+      getAllAndOverride: jest.fn(),
+    } as unknown as jest.Mocked<Reflector>;
+
     const module: TestingModule = await Test.createTestingModule({
-      providers: [JwtAuthGuard],
+      providers: [
+        JwtAuthGuard,
+        {
+          provide: Reflector,
+          useValue: reflector,
+        },
+      ],
     }).compile();
 
     guard = module.get<JwtAuthGuard>(JwtAuthGuard);
@@ -34,18 +47,27 @@ describe('JwtAuthGuard', () => {
     expect(guard).toBeDefined();
   });
 
-  it('should extend AuthGuard with "jwt" strategy', () => {
-    expect(AuthGuard).toHaveBeenCalledWith('jwt');
+  it('should allow access to public routes', async () => {
+    const context = createMockExecutionContext();
+    reflector.getAllAndOverride.mockReturnValue(true);
+
+    expect(await guard.canActivate(context)).toBe(true);
+    expect(reflector.getAllAndOverride).toHaveBeenCalledWith(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
   });
 
-  it('should pass the check to the parent class', async () => {
-    const mockContext = createMockExecutionContext();
-    
-    // Mock the canActivate method
-    const canActivateSpy = jest.spyOn(guard, 'canActivate');
-    
-    await guard.canActivate(mockContext);
-    expect(canActivateSpy).toHaveBeenCalledWith(mockContext);
+  it('should pass non-public routes to parent AuthGuard', async () => {
+    const context = createMockExecutionContext();
+    reflector.getAllAndOverride.mockReturnValue(false);
+
+    await guard.canActivate(context);
+
+    expect(reflector.getAllAndOverride).toHaveBeenCalledWith(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
   });
 
   // Helper function to create a mock execution context

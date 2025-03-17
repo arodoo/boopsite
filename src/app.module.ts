@@ -2,6 +2,7 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { WinstonModule } from 'nest-winston';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -10,6 +11,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { UsersService } from './users/users.service';
 import databaseConfig from './config/database.config';
+import { loggerConfig } from './config/logger.config';
 
 @Module({
   imports: [
@@ -17,6 +19,7 @@ import databaseConfig from './config/database.config';
       isGlobal: true,
       load: [databaseConfig],
     }),
+    WinstonModule.forRoot(loggerConfig),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
