@@ -1,7 +1,16 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogRef,
+  MatDialogModule,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,8 +33,8 @@ interface DialogData {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSelectModule
-  ]
+    MatSelectModule,
+  ],
 })
 export class UserFormDialogComponent implements OnInit {
   userForm!: FormGroup;
@@ -35,7 +44,7 @@ export class UserFormDialogComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<UserFormDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
   ) {
     this.isEditMode = !!this.data?.user;
     this.initForm();
@@ -44,17 +53,22 @@ export class UserFormDialogComponent implements OnInit {
   private initForm(): void {
     this.userForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', this.isEditMode ? [] : [Validators.required, Validators.minLength(6)]],
+      password: [
+        '',
+        this.isEditMode ? [] : [Validators.required, Validators.minLength(6)],
+      ],
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
-      role: [this.isEditMode && this.data.user ? this.data.user.role : UserRole.USER]
+      role: [
+        this.isEditMode && this.data.user ? this.data.user.role : UserRole.USER,
+      ],
     });
 
     if (this.isEditMode && this.data.user) {
       this.userForm.patchValue({
         email: this.data.user.email,
         firstName: this.data.user.firstName,
-        lastName: this.data.user.lastName
+        lastName: this.data.user.lastName,
       });
     }
   }
@@ -65,7 +79,7 @@ export class UserFormDialogComponent implements OnInit {
         email: this.data.user.email,
         firstName: this.data.user.firstName,
         lastName: this.data.user.lastName,
-        role: this.data.user.role
+        role: this.data.user.role,
       });
     }
   }

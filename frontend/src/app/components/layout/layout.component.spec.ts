@@ -22,11 +22,9 @@ describe('LayoutComponent', () => {
         RouterTestingModule,
         NoopAnimationsModule,
         MatSidenavModule,
-        MatToolbarModule
+        MatToolbarModule,
       ],
-      providers: [
-        { provide: AuthService, useValue: authServiceSpy }
-      ]
+      providers: [{ provide: AuthService, useValue: authServiceSpy }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LayoutComponent);
@@ -44,10 +42,10 @@ describe('LayoutComponent', () => {
 
   it('should toggle sidenav when toggleSidenav is called', () => {
     expect(component.isSidenavOpen).toBe(true);
-    
+
     component.toggleSidenav();
     expect(component.isSidenavOpen).toBe(false);
-    
+
     component.toggleSidenav();
     expect(component.isSidenavOpen).toBe(true);
   });

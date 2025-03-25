@@ -17,18 +17,18 @@ describe('SidebarComponent', () => {
   const adminUser = {
     id: '1',
     email: 'admin@example.com',
-    role: UserRole.ADMIN
+    role: UserRole.ADMIN,
   };
 
   const regularUser = {
     id: '2',
     email: 'user@example.com',
-    role: UserRole.USER
+    role: UserRole.USER,
   };
 
   beforeEach(async () => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', [], {
-      currentUserValue: regularUser
+      currentUserValue: regularUser,
     });
 
     await TestBed.configureTestingModule({
@@ -37,11 +37,9 @@ describe('SidebarComponent', () => {
         NoopAnimationsModule,
         MatListModule,
         MatIconModule,
-        MatExpansionModule
+        MatExpansionModule,
       ],
-      providers: [
-        { provide: AuthService, useValue: authServiceSpy }
-      ]
+      providers: [{ provide: AuthService, useValue: authServiceSpy }],
     }).compileComponents();
 
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
@@ -72,7 +70,7 @@ describe('SidebarComponent', () => {
   it('should allow admin routes for admin users', () => {
     // Set the current user to admin
     Object.defineProperty(authService, 'currentUserValue', {
-      get: () => adminUser
+      get: () => adminUser,
     });
 
     // Admin should have access to admin routes
@@ -82,12 +80,17 @@ describe('SidebarComponent', () => {
   it('should filter nav items based on user role', () => {
     // Test with regular user
     Object.defineProperty(authService, 'currentUserValue', {
-      get: () => regularUser
+      get: () => regularUser,
     });
-    
+
     const testItems = [
       { label: 'Public', route: '/public', icon: 'public' },
-      { label: 'Admin Only', route: '/admin', icon: 'admin', roles: [UserRole.ADMIN] }
+      {
+        label: 'Admin Only',
+        route: '/admin',
+        icon: 'admin',
+        roles: [UserRole.ADMIN],
+      },
     ];
 
     const filteredItems = component.filterNavItems(testItems);
@@ -96,9 +99,9 @@ describe('SidebarComponent', () => {
 
     // Test with admin user
     Object.defineProperty(authService, 'currentUserValue', {
-      get: () => adminUser
+      get: () => adminUser,
     });
-    
+
     const adminFilteredItems = component.filterNavItems(testItems);
     expect(adminFilteredItems.length).toBe(2);
   });

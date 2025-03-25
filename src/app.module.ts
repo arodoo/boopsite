@@ -1,17 +1,12 @@
-import { Module, OnModuleInit } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
-import { WinstonModule } from 'nest-winston';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { RolesGuard } from './auth/guards/roles.guard';
-import { UsersService } from './users/users.service';
+import { AppGuardsModule } from './app-guards/app-guards.module';
+import { DatabaseModule } from './database/database.module';
+import { LoggerModule } from './logger/logger.module';
 import databaseConfig from './config/database.config';
-import { loggerConfig } from './config/logger.config';
 
 @Module({
   imports: [
@@ -19,37 +14,13 @@ import { loggerConfig } from './config/logger.config';
       isGlobal: true,
       load: [databaseConfig],
     }),
-    WinstonModule.forRoot(loggerConfig),
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'sqlite',
-        database: configService.get<string>('database.database'),
-        entities: configService.get<string[]>('database.entities'),
-        synchronize: configService.get<boolean>('database.synchronize'),
-        logging: configService.get<boolean>('database.logging'),
-      }),
-    }),
+    LoggerModule,
+    DatabaseModule,
     UsersModule,
     AuthModule,
+    AppGuardsModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-  ],
+  providers: [],
 })
-export class AppModule implements OnModuleInit {
-  constructor(private readonly usersService: UsersService) {}
-
-  async onModuleInit() {
-    await this.usersService.ensureAdminUser();
-  }
-}
+export class AppModule {}

@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,
-  imports: [RouterModule]
+  imports: [RouterModule],
 })
 export class AppComponent {
   title = 'frontend';

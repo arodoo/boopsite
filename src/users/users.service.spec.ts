@@ -11,7 +11,7 @@ import * as bcrypt from 'bcrypt';
 jest.mock('bcrypt', () => ({
   genSalt: jest.fn().mockResolvedValue('salt'),
   hash: jest.fn().mockResolvedValue('hashedPassword'),
-  compare: jest.fn()
+  compare: jest.fn(),
 }));
 
 describe('UsersService', () => {
@@ -52,12 +52,12 @@ describe('UsersService', () => {
     password: 'password123',
     firstName: 'New',
     lastName: 'User',
-    role: UserRole.USER
+    role: UserRole.USER,
   };
-  
+
   const sampleUpdateUserDto: UpdateUserDto = {
     firstName: 'Updated',
-    lastName: 'Name'
+    lastName: 'Name',
   };
 
   beforeEach(async () => {
@@ -91,11 +91,35 @@ describe('UsersService', () => {
       Object.assign(user, dto);
       return user;
     });
-    
+
     // Correctly type the save method to match Repository.save
-    userRepository.save.mockImplementation((entity: DeepPartial<User> | DeepPartial<User>[], options?: SaveOptions): Promise<any> => {
-      if (Array.isArray(entity)) {
-        return Promise.resolve(entity.map(e => ({
+    userRepository.save.mockImplementation(
+      (
+        entity: DeepPartial<User> | DeepPartial<User>[],
+        options?: SaveOptions,
+      ): Promise<any> => {
+        if (Array.isArray(entity)) {
+          return Promise.resolve(
+            entity.map(
+              (e) =>
+                ({
+                  id: '1',
+                  email: 'test@example.com',
+                  password: 'hashedPassword',
+                  firstName: 'Test',
+                  lastName: 'User',
+                  role: UserRole.USER,
+                  isActive: true,
+                  fingerprintHash: 'hash',
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                  ...e,
+                }) as User,
+            ),
+          );
+        }
+
+        return Promise.resolve({
           id: '1',
           email: 'test@example.com',
           password: 'hashedPassword',
@@ -106,25 +130,11 @@ describe('UsersService', () => {
           fingerprintHash: 'hash',
           createdAt: new Date(),
           updatedAt: new Date(),
-          ...e
-        } as User)));
-      }
-      
-      return Promise.resolve({
-        id: '1',
-        email: 'test@example.com',
-        password: 'hashedPassword',
-        firstName: 'Test',
-        lastName: 'User',
-        role: UserRole.USER,
-        isActive: true,
-        fingerprintHash: 'hash',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        ...entity
-      } as User);
-    });
-    
+          ...entity,
+        } as User);
+      },
+    );
+
     userRepository.remove.mockImplementation((entity: User): Promise<User> => {
       return Promise.resolve(entity);
     });
@@ -148,7 +158,9 @@ describe('UsersService', () => {
 
       const result = await service.findById('1');
       expect(result).toEqual(mockUsers[0]);
-      expect(userRepository.findOne).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(userRepository.findOne).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
     });
 
     it('should throw NotFoundException when user is not found', async () => {
@@ -179,9 +191,12 @@ describe('UsersService', () => {
       userRepository.findOne.mockResolvedValue(null);
 
       const result = await service.create(sampleCreateUserDto);
-      
+
       expect(bcrypt.genSalt).toHaveBeenCalled();
-      expect(bcrypt.hash).toHaveBeenCalledWith(sampleCreateUserDto.password, 'salt');
+      expect(bcrypt.hash).toHaveBeenCalledWith(
+        sampleCreateUserDto.password,
+        'salt',
+      );
       expect(userRepository.create).toHaveBeenCalled();
       expect(result).toHaveProperty('email', sampleCreateUserDto.email);
     });
@@ -191,12 +206,14 @@ describe('UsersService', () => {
         email: 'admin@example.com',
         password: 'password123',
         firstName: 'Test',
-        lastName: 'User'
+        lastName: 'User',
       };
-      
+
       userRepository.findOne.mockResolvedValue(mockUsers[0]);
 
-      await expect(service.create(conflictDto)).rejects.toThrow(ConflictException);
+      await expect(service.create(conflictDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
@@ -205,16 +222,16 @@ describe('UsersService', () => {
       userRepository.findOne.mockResolvedValue(mockUsers[0]);
 
       const result = await service.update('1', sampleUpdateUserDto);
-      
+
       expect(userRepository.save).toHaveBeenCalled();
       expect(result).toHaveProperty('firstName', sampleUpdateUserDto.firstName);
     });
 
     it('should hash password when updating password', async () => {
       userRepository.findOne.mockResolvedValue(mockUsers[0]);
-      
+
       await service.update('1', { password: 'newpassword' });
-      
+
       expect(bcrypt.genSalt).toHaveBeenCalled();
       expect(bcrypt.hash).toHaveBeenCalledWith('newpassword', 'salt');
     });
@@ -222,7 +239,9 @@ describe('UsersService', () => {
     it('should throw NotFoundException when user is not found', async () => {
       userRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.update('999', sampleUpdateUserDto)).rejects.toThrow(NotFoundException);
+      await expect(service.update('999', sampleUpdateUserDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -232,9 +251,9 @@ describe('UsersService', () => {
 
       const result = await service.updateProfile('1', {
         firstName: 'Updated',
-        lastName: 'Profile'
+        lastName: 'Profile',
       });
-      
+
       expect(result).toHaveProperty('firstName', 'Updated');
     });
 
@@ -244,9 +263,9 @@ describe('UsersService', () => {
 
       const result = await service.updateProfile('1', {
         firstName: 'Updated',
-        role: UserRole.ADMIN
+        role: UserRole.ADMIN,
       });
-      
+
       expect(result.role).toBe(UserRole.USER); // Role should remain unchanged
     });
   });
@@ -256,7 +275,7 @@ describe('UsersService', () => {
       userRepository.findOne.mockResolvedValue(mockUsers[0]);
 
       await service.remove('1');
-      
+
       expect(userRepository.remove).toHaveBeenCalledWith(mockUsers[0]);
     });
 
@@ -272,15 +291,20 @@ describe('UsersService', () => {
       const user = { ...mockUsers[0], fingerprintHash: undefined };
       userRepository.findOne.mockResolvedValue(user);
 
-      const result = await service.linkFingerprint('admin@example.com', 'test-fingerprint-hash');
-      
+      const result = await service.linkFingerprint(
+        'admin@example.com',
+        'test-fingerprint-hash',
+      );
+
       expect(result).toHaveProperty('fingerprintHash', 'test-fingerprint-hash');
     });
 
     it('should throw NotFoundException when user is not found', async () => {
       userRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.linkFingerprint('nonexistent@example.com', 'hash')).rejects.toThrow(NotFoundException);
+      await expect(
+        service.linkFingerprint('nonexistent@example.com', 'hash'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 

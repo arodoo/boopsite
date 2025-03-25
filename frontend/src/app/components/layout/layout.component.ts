@@ -18,8 +18,8 @@ import { SidebarComponent } from './sidebar/sidebar.component';
     MatSidenavModule,
     MatToolbarModule,
     NavbarComponent,
-    SidebarComponent
-  ]
+    SidebarComponent,
+  ],
 })
 export class LayoutComponent implements OnInit {
   isSidenavOpen = true;

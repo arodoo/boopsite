@@ -12,30 +12,25 @@ import { User } from '../../models/user.model';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatIconModule,
-    MatButtonModule
-  ]
+  imports: [CommonModule, MatCardModule, MatIconModule, MatButtonModule],
 })
 export class DashboardComponent implements OnInit {
   currentUser: User | null = null;
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
     this.currentUser = this.authService.currentUserValue;
-    
+
     // Redirect to login if not authenticated
     if (!this.currentUser) {
       this.router.navigate(['/login']);
     }
   }
-  
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

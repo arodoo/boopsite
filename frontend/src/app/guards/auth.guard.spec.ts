@@ -10,12 +10,12 @@ describe('AuthGuard', () => {
 
   const mockUser = {
     id: '1',
-    email: 'test@example.com'
+    email: 'test@example.com',
   };
 
   beforeEach(() => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', [], {
-      currentUserValue: mockUser
+      currentUserValue: mockUser,
     });
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -23,8 +23,8 @@ describe('AuthGuard', () => {
       providers: [
         AuthGuard,
         { provide: AuthService, useValue: authServiceSpy },
-        { provide: Router, useValue: routerSpy }
-      ]
+        { provide: Router, useValue: routerSpy },
+      ],
     });
 
     guard = TestBed.inject(AuthGuard);
@@ -43,9 +43,9 @@ describe('AuthGuard', () => {
 
   it('should redirect to login when user is not authenticated', () => {
     Object.defineProperty(authService, 'currentUserValue', {
-      get: () => null
+      get: () => null,
     });
-    
+
     expect(guard.canActivate()).toBe(false);
     expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });

@@ -16,15 +16,13 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'profile', component: ProfileComponent },
-      { 
+      {
         path: 'admin',
         canActivate: [AdminGuard],
-        children: [
-          { path: 'users', component: UsersListComponent }
-        ]
+        children: [{ path: 'users', component: UsersListComponent }],
       },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
-    ]
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    ],
   },
-  { path: '**', redirectTo: '/login' }
+  { path: '**', redirectTo: '/login' },
 ];

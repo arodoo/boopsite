@@ -7,7 +7,7 @@ import { User, CreateUserDto, UpdateUserDto } from '../models/user.model';
 const API_URL = 'http://localhost:3000';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UsersService {
   constructor(private http: HttpClient) {}

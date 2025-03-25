@@ -20,8 +20,8 @@ describe('UsersController', () => {
       isActive: true,
       fingerprintHash: 'hash1',
       createdAt: new Date(),
-      updatedAt: new Date()
-    }
+      updatedAt: new Date(),
+    },
   ];
 
   beforeEach(async () => {
@@ -39,8 +39,8 @@ describe('UsersController', () => {
       providers: [
         {
           provide: UsersService,
-          useValue: mockService
-        }
+          useValue: mockService,
+        },
       ],
     }).compile();
 
@@ -81,7 +81,7 @@ describe('UsersController', () => {
         lastName: 'User',
         role: UserRole.USER,
       };
-      
+
       const newUser = {
         id: '3',
         ...createUserDto,
@@ -105,7 +105,7 @@ describe('UsersController', () => {
         firstName: 'Updated',
         lastName: 'Name',
       };
-      
+
       const updatedUser = {
         ...mockUsers[0],
         ...updateUserDto,
@@ -136,12 +136,12 @@ describe('UsersController', () => {
           role: UserRole.USER,
         },
       };
-      
+
       const updateUserDto = {
         firstName: 'Updated',
         lastName: 'Profile',
       };
-      
+
       const updatedUser = {
         ...mockUsers[0],
         ...updateUserDto,
@@ -161,12 +161,12 @@ describe('UsersController', () => {
           role: UserRole.ADMIN,
         },
       };
-      
+
       const updateUserDto = {
         firstName: 'Updated',
         lastName: 'ByAdmin',
       };
-      
+
       const updatedUser = {
         ...mockUsers[1], // Updating user with ID 2
         ...updateUserDto,
@@ -186,14 +186,15 @@ describe('UsersController', () => {
           role: UserRole.USER,
         },
       };
-      
+
       const updateUserDto = {
         firstName: 'Updated',
         lastName: 'Forbidden',
       };
 
-      await expect(controller.updateProfile(req, '2', updateUserDto))
-        .rejects.toThrow(ForbiddenException);
+      await expect(
+        controller.updateProfile(req, '2', updateUserDto),
+      ).rejects.toThrow(ForbiddenException);
       expect(service.updateProfile).not.toHaveBeenCalled();
     });
 
@@ -204,19 +205,19 @@ describe('UsersController', () => {
           role: UserRole.USER,
         },
       };
-      
+
       const updateUserDto = {
         firstName: 'Updated',
         lastName: 'Profile',
         role: UserRole.ADMIN, // Trying to promote themselves
       };
-      
+
       const expectedDto = {
         firstName: 'Updated',
         lastName: 'Profile',
         // Role should be removed
       };
-      
+
       const updatedUser = {
         ...mockUsers[1],
         ...expectedDto,
@@ -225,13 +226,19 @@ describe('UsersController', () => {
       service.updateProfile.mockResolvedValue(Promise.resolve(updatedUser));
 
       await controller.updateProfile(req, '2', updateUserDto);
-      expect(service.updateProfile).toHaveBeenCalledWith('2', expect.objectContaining({
-        firstName: 'Updated',
-        lastName: 'Profile',
-      }));
-      expect(service.updateProfile).not.toHaveBeenCalledWith('2', expect.objectContaining({
-        role: UserRole.ADMIN,
-      }));
+      expect(service.updateProfile).toHaveBeenCalledWith(
+        '2',
+        expect.objectContaining({
+          firstName: 'Updated',
+          lastName: 'Profile',
+        }),
+      );
+      expect(service.updateProfile).not.toHaveBeenCalledWith(
+        '2',
+        expect.objectContaining({
+          role: UserRole.ADMIN,
+        }),
+      );
     });
   });
 });

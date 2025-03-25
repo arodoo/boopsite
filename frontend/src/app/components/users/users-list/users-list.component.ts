@@ -25,11 +25,17 @@ import { UserFormDialogComponent } from '../user-form-dialog/user-form-dialog.co
     MatSortModule,
     MatButtonModule,
     MatIconModule,
-    MatDialogModule
-  ]
+    MatDialogModule,
+  ],
 })
 export class UsersListComponent implements OnInit {
-  displayedColumns: string[] = ['email', 'firstName', 'lastName', 'role', 'actions'];
+  displayedColumns: string[] = [
+    'email',
+    'firstName',
+    'lastName',
+    'role',
+    'actions',
+  ];
   users: User[] = [];
   dataSource = new MatTableDataSource<User>([]);
 
@@ -39,7 +45,7 @@ export class UsersListComponent implements OnInit {
   constructor(
     private usersService: UsersService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {
     this.dataSource = new MatTableDataSource<User>();
   }
@@ -49,14 +55,17 @@ export class UsersListComponent implements OnInit {
   }
 
   public loadUsers() {
-    this.usersService.getUsers()
+    this.usersService
+      .getUsers()
       .pipe(
-        catchError(error => {
-          this.snackBar.open('Error loading users', 'Close', { duration: 3000 });
+        catchError((error) => {
+          this.snackBar.open('Error loading users', 'Close', {
+            duration: 3000,
+          });
           return of([]);
-        })
+        }),
       )
-      .subscribe(users => {
+      .subscribe((users) => {
         this.users = users;
         this.dataSource.data = users;
       });
@@ -66,10 +75,10 @@ export class UsersListComponent implements OnInit {
     const dialogRef = this.dialog.open(UserFormDialogComponent, {
       width: '400px',
       data: { user },
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         if (user) {
           this.usersService.updateUser(user.id, result).subscribe({
@@ -78,23 +87,31 @@ export class UsersListComponent implements OnInit {
               if (index !== -1) {
                 this.users[index] = updatedUser;
                 this.dataSource.data = [...this.users];
-                this.snackBar.open('User updated successfully', 'Close', { duration: 3000 });
+                this.snackBar.open('User updated successfully', 'Close', {
+                  duration: 3000,
+                });
               }
             },
             error: () => {
-              this.snackBar.open('Error updating user', 'Close', { duration: 3000 });
-            }
+              this.snackBar.open('Error updating user', 'Close', {
+                duration: 3000,
+              });
+            },
           });
         } else {
           this.usersService.createUser(result).subscribe({
             next: (newUser: User) => {
               this.users.push(newUser);
               this.dataSource.data = [...this.users];
-              this.snackBar.open('User created successfully', 'Close', { duration: 3000 });
+              this.snackBar.open('User created successfully', 'Close', {
+                duration: 3000,
+              });
             },
             error: () => {
-              this.snackBar.open('Error creating user', 'Close', { duration: 3000 });
-            }
+              this.snackBar.open('Error creating user', 'Close', {
+                duration: 3000,
+              });
+            },
           });
         }
       }
@@ -104,24 +121,36 @@ export class UsersListComponent implements OnInit {
   private createUser(userData: any): void {
     this.usersService.createUser(userData).subscribe({
       next: () => {
-        this.snackBar.open('User created successfully', 'Close', { duration: 3000 });
+        this.snackBar.open('User created successfully', 'Close', {
+          duration: 3000,
+        });
         this.loadUsers();
       },
       error: (error) => {
-        this.snackBar.open(error.error.message || 'Error creating user', 'Close', { duration: 3000 });
-      }
+        this.snackBar.open(
+          error.error.message || 'Error creating user',
+          'Close',
+          { duration: 3000 },
+        );
+      },
     });
   }
 
   private updateUser(id: string, userData: any): void {
     this.usersService.updateUser(id, userData).subscribe({
       next: () => {
-        this.snackBar.open('User updated successfully', 'Close', { duration: 3000 });
+        this.snackBar.open('User updated successfully', 'Close', {
+          duration: 3000,
+        });
         this.loadUsers();
       },
       error: (error) => {
-        this.snackBar.open(error.error.message || 'Error updating user', 'Close', { duration: 3000 });
-      }
+        this.snackBar.open(
+          error.error.message || 'Error updating user',
+          'Close',
+          { duration: 3000 },
+        );
+      },
     });
   }
 
@@ -129,12 +158,18 @@ export class UsersListComponent implements OnInit {
     if (confirm('Are you sure you want to delete this user?')) {
       this.usersService.deleteUser(id).subscribe({
         next: () => {
-          this.snackBar.open('User deleted successfully', 'Close', { duration: 3000 });
+          this.snackBar.open('User deleted successfully', 'Close', {
+            duration: 3000,
+          });
           this.loadUsers();
         },
         error: (error) => {
-          this.snackBar.open(error.error.message || 'Error deleting user', 'Close', { duration: 3000 });
-        }
+          this.snackBar.open(
+            error.error.message || 'Error deleting user',
+            'Close',
+            { duration: 3000 },
+          );
+        },
       });
     }
   }

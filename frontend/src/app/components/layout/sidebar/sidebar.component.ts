@@ -25,31 +25,29 @@ interface NavItem {
     RouterModule,
     MatListModule,
     MatIconModule,
-    MatExpansionModule
-  ]
+    MatExpansionModule,
+  ],
 })
 export class SidebarComponent {
   navItems: NavItem[] = [
-    { 
-      label: 'Dashboard', 
-      route: '/dashboard', 
-      icon: 'dashboard' 
+    {
+      label: 'Dashboard',
+      route: '/dashboard',
+      icon: 'dashboard',
     },
-    { 
+    {
       label: 'My Account',
       icon: 'person',
       children: [
-        { label: 'Profile', route: '/profile', icon: 'account_circle' }
-      ]
+        { label: 'Profile', route: '/profile', icon: 'account_circle' },
+      ],
     },
-    { 
+    {
       label: 'Administration',
       icon: 'admin_panel_settings',
       roles: [UserRole.ADMIN],
-      children: [
-        { label: 'Users', route: '/admin/users', icon: 'group' }
-      ]
-    }
+      children: [{ label: 'Users', route: '/admin/users', icon: 'group' }],
+    },
   ];
 
   constructor(private authService: AuthService) {}
@@ -61,6 +59,6 @@ export class SidebarComponent {
   }
 
   filterNavItems(items: NavItem[]): NavItem[] {
-    return items.filter(item => this.hasPermission(item.roles));
+    return items.filter((item) => this.hasPermission(item.roles));
   }
 }

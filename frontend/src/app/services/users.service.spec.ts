@@ -1,8 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 import { UsersService } from './users.service';
-import { User, UserRole, CreateUserDto, UpdateUserDto } from '../models/user.model';
+import {
+  User,
+  UserRole,
+  CreateUserDto,
+  UpdateUserDto,
+} from '../models/user.model';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -15,21 +23,21 @@ describe('UsersService', () => {
       email: 'admin@example.com',
       role: UserRole.ADMIN,
       firstName: 'Admin',
-      lastName: 'User'
+      lastName: 'User',
     },
     {
       id: '2',
       email: 'user@example.com',
       role: UserRole.USER,
       firstName: 'Regular',
-      lastName: 'User'
-    }
+      lastName: 'User',
+    },
   ];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [UsersService]
+      providers: [UsersService],
     });
 
     service = TestBed.inject(UsersService);
@@ -50,7 +58,7 @@ describe('UsersService', () => {
         next: (users) => {
           expect(users.length).toBe(2);
           expect(users).toEqual(mockUsers);
-        }
+        },
       });
 
       const req = controller.expectOne(`${API_URL}/users`);
@@ -60,7 +68,7 @@ describe('UsersService', () => {
 
     it('should handle error when getting users fails', (done) => {
       const errorMessage = 'Server error';
-      
+
       service.getUsers().subscribe({
         next: () => {
           done.fail('Should have failed with 500 error');
@@ -69,23 +77,26 @@ describe('UsersService', () => {
           expect(error.status).toBe(500);
           expect(error.error).toBe(errorMessage);
           done();
-        }
+        },
       });
 
       const req = controller.expectOne(`${API_URL}/users`);
-      req.flush(errorMessage, { status: 500, statusText: 'Internal Server Error' });
+      req.flush(errorMessage, {
+        status: 500,
+        statusText: 'Internal Server Error',
+      });
     });
   });
 
   describe('getUser', () => {
     it('should return a single user by id', () => {
       const userId = '1';
-      const user = mockUsers.find(u => u.id === userId)!;
+      const user = mockUsers.find((u) => u.id === userId)!;
 
       service.getUser(userId).subscribe({
         next: (result) => {
           expect(result).toEqual(user);
-        }
+        },
       });
 
       const req = controller.expectOne(`${API_URL}/users/${userId}`);
@@ -95,7 +106,7 @@ describe('UsersService', () => {
 
     it('should handle 404 when user is not found', (done) => {
       const userId = 'nonexistent';
-      
+
       service.getUser(userId).subscribe({
         next: () => {
           done.fail('Should have failed with 404 error');
@@ -104,7 +115,7 @@ describe('UsersService', () => {
           expect(error.status).toBe(404);
           expect(error.error).toBe('User not found');
           done();
-        }
+        },
       });
 
       const req = controller.expectOne(`${API_URL}/users/${userId}`);
@@ -118,7 +129,7 @@ describe('UsersService', () => {
         error: (error: HttpErrorResponse) => {
           expect(error.status).toBe(400);
           expect(error.error).toBe('Invalid user ID');
-        }
+        },
       });
 
       const req = controller.expectOne(`${API_URL}/users/${userId}`);
@@ -132,7 +143,7 @@ describe('UsersService', () => {
       password: 'password123',
       firstName: 'New',
       lastName: 'User',
-      role: UserRole.USER
+      role: UserRole.USER,
     };
 
     it('should create a user successfully', () => {
@@ -141,13 +152,13 @@ describe('UsersService', () => {
         email: newUser.email,
         role: newUser.role!,
         firstName: newUser.firstName,
-        lastName: newUser.lastName
+        lastName: newUser.lastName,
       };
 
       service.createUser(newUser).subscribe({
         next: (result) => {
           expect(result).toEqual(createdUser);
-        }
+        },
       });
 
       const req = controller.expectOne(`${API_URL}/users`);
@@ -162,7 +173,7 @@ describe('UsersService', () => {
         password: 'password123',
         firstName: 'New',
         lastName: 'User',
-        role: UserRole.USER
+        role: UserRole.USER,
       };
 
       service.createUser(newUser).subscribe({
@@ -173,31 +184,34 @@ describe('UsersService', () => {
           expect(error.status).toBe(409);
           expect(error.error).toBe('Email already exists');
           done();
-        }
+        },
       });
 
       const req = controller.expectOne(`${API_URL}/users`);
-      req.flush('Email already exists', { status: 409, statusText: 'Conflict' });
+      req.flush('Email already exists', {
+        status: 409,
+        statusText: 'Conflict',
+      });
     });
   });
 
   describe('updateUser', () => {
     const updateData: UpdateUserDto = {
       firstName: 'Updated',
-      lastName: 'Name'
+      lastName: 'Name',
     };
 
     it('should update user successfully', () => {
       const userId = '1';
       const updatedUser: User = {
         ...mockUsers[0],
-        ...updateData
+        ...updateData,
       };
 
       service.updateUser(userId, updateData).subscribe({
         next: (result) => {
           expect(result).toEqual(updatedUser);
-        }
+        },
       });
 
       const req = controller.expectOne(`${API_URL}/users/${userId}`);
@@ -208,12 +222,12 @@ describe('UsersService', () => {
 
     it('should handle 404 when updating non-existent user', () => {
       const userId = 'nonexistent';
-      
+
       service.updateUser(userId, updateData).subscribe({
         error: (error: HttpErrorResponse) => {
           expect(error.status).toBe(404);
           expect(error.error).toBe('User not found');
-        }
+        },
       });
 
       const req = controller.expectOne(`${API_URL}/users/${userId}`);
@@ -228,7 +242,7 @@ describe('UsersService', () => {
       service.deleteUser(userId).subscribe({
         next: (result) => {
           expect(result).toBeUndefined();
-        }
+        },
       });
 
       const req = controller.expectOne(`${API_URL}/users/${userId}`);
@@ -238,12 +252,12 @@ describe('UsersService', () => {
 
     it('should handle 404 when deleting non-existent user', () => {
       const userId = 'nonexistent';
-      
+
       service.deleteUser(userId).subscribe({
         error: (error: HttpErrorResponse) => {
           expect(error.status).toBe(404);
           expect(error.error).toBe('User not found');
-        }
+        },
       });
 
       const req = controller.expectOne(`${API_URL}/users/${userId}`);
@@ -254,20 +268,20 @@ describe('UsersService', () => {
   describe('updateProfile', () => {
     const profileData: UpdateUserDto = {
       firstName: 'Updated',
-      lastName: 'Profile'
+      lastName: 'Profile',
     };
 
     it('should update profile successfully', () => {
       const userId = '1';
       const updatedUser: User = {
         ...mockUsers[0],
-        ...profileData
+        ...profileData,
       };
 
       service.updateProfile(userId, profileData).subscribe({
         next: (result) => {
           expect(result).toEqual(updatedUser);
-        }
+        },
       });
 
       const req = controller.expectOne(`${API_URL}/users/${userId}/profile`);
@@ -278,12 +292,12 @@ describe('UsersService', () => {
 
     it('should handle 404 when updating non-existent profile', () => {
       const userId = 'nonexistent';
-      
+
       service.updateProfile(userId, profileData).subscribe({
         error: (error: HttpErrorResponse) => {
           expect(error.status).toBe(404);
           expect(error.error).toBe('User not found');
-        }
+        },
       });
 
       const req = controller.expectOne(`${API_URL}/users/${userId}/profile`);

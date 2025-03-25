@@ -23,12 +23,12 @@ describe('NavbarComponent', () => {
         RouterTestingModule,
         MatToolbarModule,
         MatButtonModule,
-        MatIconModule
+        MatIconModule,
       ],
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
-        { provide: Router, useValue: routerSpy }
-      ]
+        { provide: Router, useValue: routerSpy },
+      ],
     }).compileComponents();
 
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;

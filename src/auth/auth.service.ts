@@ -11,7 +11,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
   /**
@@ -31,10 +31,10 @@ export class AuthService {
 
     try {
       const isPasswordValid = await bcrypt.compare(password, user.password);
-      this.logger.info('Password validation result', { 
-        email, 
+      this.logger.info('Password validation result', {
+        email,
         isValid: isPasswordValid,
-        passwordHash: user.password 
+        passwordHash: user.password,
       });
 
       if (isPasswordValid) {
@@ -42,10 +42,10 @@ export class AuthService {
         return result;
       }
     } catch (error) {
-      this.logger.error('Error during password validation', { 
-        email, 
+      this.logger.error('Error during password validation', {
+        email,
         error: error.message,
-        stack: error.stack 
+        stack: error.stack,
       });
     }
 
@@ -60,22 +60,24 @@ export class AuthService {
   async login(user: LoginUserDto) {
     this.logger.info('Login attempt', { email: user.email });
     const validatedUser = await this.validateUser(user.email, user.password);
-    
+
     if (!validatedUser) {
-      this.logger.error('Login failed - invalid credentials', { email: user.email });
+      this.logger.error('Login failed - invalid credentials', {
+        email: user.email,
+      });
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { 
-      email: validatedUser.email, 
+    const payload = {
+      email: validatedUser.email,
       sub: validatedUser.id,
-      role: validatedUser.role
+      role: validatedUser.role,
     };
-    
-    this.logger.info('Login successful', { 
-      email: user.email, 
+
+    this.logger.info('Login successful', {
+      email: user.email,
       userId: validatedUser.id,
-      role: validatedUser.role 
+      role: validatedUser.role,
     });
 
     return {
@@ -96,18 +98,20 @@ export class AuthService {
    * @returns JWT token and user information
    */
   async loginWithFingerprint(fingerprintDto: FingerprintDto) {
-    const user = await this.usersService.findByFingerprint(fingerprintDto.fingerprintHash);
-    
+    const user = await this.usersService.findByFingerprint(
+      fingerprintDto.fingerprintHash,
+    );
+
     if (!user) {
       throw new UnauthorizedException('Invalid fingerprint');
     }
-    
-    const payload = { 
-      email: user.email, 
+
+    const payload = {
+      email: user.email,
       sub: user.id,
-      role: user.role
+      role: user.role,
     };
-    
+
     return {
       access_token: this.jwtService.sign(payload),
       user: {
@@ -127,7 +131,10 @@ export class AuthService {
    * @returns Updated user information
    */
   async registerFingerprint(email: string, fingerprintHash: string) {
-    const user = await this.usersService.linkFingerprint(email, fingerprintHash);
+    const user = await this.usersService.linkFingerprint(
+      email,
+      fingerprintHash,
+    );
     return {
       message: 'Fingerprint registered successfully',
       user: {

@@ -19,25 +19,20 @@ describe('DashboardComponent', () => {
   const mockUser = {
     id: '1',
     email: 'test@example.com',
-    role: UserRole.USER
+    role: UserRole.USER,
   };
 
   beforeEach(async () => {
     mockUserSubject = new BehaviorSubject(mockUser);
-    
+
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['logout'], {
       currentUserValue: mockUser,
-      currentUser$: mockUserSubject.asObservable()
+      currentUser$: mockUserSubject.asObservable(),
     });
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
-      imports: [
-        CommonModule,
-        MatCardModule,
-        MatButtonModule,
-        MatIconModule,
-      ],
+      imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule],
       declarations: [],
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
@@ -67,7 +62,7 @@ describe('DashboardComponent', () => {
     // Update the mock user subject to simulate user logout
     mockUserSubject.next(null);
     Object.defineProperty(authService, 'currentUserValue', { get: () => null });
-    
+
     component.ngOnInit();
     expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
@@ -81,7 +76,8 @@ describe('DashboardComponent', () => {
   it('should display user email in the template', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('mat-card-subtitle').textContent)
-      .toContain(mockUser.email);
+    expect(compiled.querySelector('mat-card-subtitle').textContent).toContain(
+      mockUser.email,
+    );
   });
 });

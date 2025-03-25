@@ -47,7 +47,9 @@ describe('JwtStrategy', () => {
     });
 
     it('should throw UnauthorizedException when payload is null', async () => {
-      await expect(strategy.validate(null)).rejects.toThrow(UnauthorizedException);
+      await expect(strategy.validate(null)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 });

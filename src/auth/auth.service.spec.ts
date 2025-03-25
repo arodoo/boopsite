@@ -52,12 +52,14 @@ describe('AuthService', () => {
     it('should return user object without password when credentials are valid', async () => {
       const email = 'test@example.com';
       const password = 'password123';
-      
+
       mockUsersService.findByEmail.mockResolvedValue(mockUser);
-      jest.spyOn(bcrypt, 'compare').mockImplementation(() => Promise.resolve(true));
+      jest
+        .spyOn(bcrypt, 'compare')
+        .mockImplementation(() => Promise.resolve(true));
 
       const result = await service.validateUser(email, password);
-      
+
       expect(result).toBeDefined();
       expect(result.password).toBeUndefined();
       expect(result.email).toBe(email);
@@ -66,17 +68,25 @@ describe('AuthService', () => {
     it('should return null when user is not found', async () => {
       mockUsersService.findByEmail.mockResolvedValue(null);
 
-      const result = await service.validateUser('nonexistent@example.com', 'password123');
-      
+      const result = await service.validateUser(
+        'nonexistent@example.com',
+        'password123',
+      );
+
       expect(result).toBeNull();
     });
 
     it('should return null when password is invalid', async () => {
       mockUsersService.findByEmail.mockResolvedValue(mockUser);
-      jest.spyOn(bcrypt, 'compare').mockImplementation(() => Promise.resolve(false));
+      jest
+        .spyOn(bcrypt, 'compare')
+        .mockImplementation(() => Promise.resolve(false));
 
-      const result = await service.validateUser('test@example.com', 'wrongpassword');
-      
+      const result = await service.validateUser(
+        'test@example.com',
+        'wrongpassword',
+      );
+
       expect(result).toBeNull();
     });
   });
@@ -101,10 +111,12 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException when credentials are invalid', async () => {
       const loginDto = { email: 'test@example.com', password: 'wrongpassword' };
-      
+
       jest.spyOn(service, 'validateUser').mockResolvedValue(null);
 
-      await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
+      await expect(service.login(loginDto)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 
@@ -125,11 +137,12 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException when fingerprint is invalid', async () => {
       const fingerprintDto = { fingerprintHash: 'invalidFingerprintHash' };
-      
+
       mockUsersService.findByFingerprint.mockResolvedValue(null);
 
-      await expect(service.loginWithFingerprint(fingerprintDto))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.loginWithFingerprint(fingerprintDto),
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 

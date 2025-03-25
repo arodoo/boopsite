@@ -1,5 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 import { AuthService } from './auth.service';
 import { User, UserRole } from '../models/user.model';
 
@@ -15,21 +18,21 @@ describe('AuthService', () => {
   const mockUser: User = {
     id: '1',
     email: 'test@example.com',
-    role: UserRole.USER
+    role: UserRole.USER,
   };
 
   const mockAuthResponse: AuthResponse = {
     access_token: 'mock-jwt-token',
-    user: mockUser
+    user: mockUser,
   };
 
   beforeEach(() => {
     // Clear localStorage before each test
     localStorage.clear();
-    
+
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [AuthService]
+      providers: [AuthService],
     });
 
     service = TestBed.inject(AuthService);
@@ -50,10 +53,14 @@ describe('AuthService', () => {
       const email = 'test@example.com';
       const password = 'password123';
 
-      service.login(email, password).subscribe(response => {
+      service.login(email, password).subscribe((response) => {
         expect(response).toEqual(mockAuthResponse);
-        expect(localStorage.getItem('currentUser')).toBe(JSON.stringify(mockUser));
-        expect(localStorage.getItem('token')).toBe(mockAuthResponse.access_token);
+        expect(localStorage.getItem('currentUser')).toBe(
+          JSON.stringify(mockUser),
+        );
+        expect(localStorage.getItem('token')).toBe(
+          mockAuthResponse.access_token,
+        );
         expect(service.currentUserValue).toEqual(mockUser);
       });
 
@@ -69,14 +76,20 @@ describe('AuthService', () => {
     it('should authenticate user with fingerprint and store token', () => {
       const fingerprintHash = 'mock-fingerprint-hash';
 
-      service.loginWithFingerprint(fingerprintHash).subscribe(response => {
+      service.loginWithFingerprint(fingerprintHash).subscribe((response) => {
         expect(response).toEqual(mockAuthResponse);
-        expect(localStorage.getItem('currentUser')).toBe(JSON.stringify(mockUser));
-        expect(localStorage.getItem('token')).toBe(mockAuthResponse.access_token);
+        expect(localStorage.getItem('currentUser')).toBe(
+          JSON.stringify(mockUser),
+        );
+        expect(localStorage.getItem('token')).toBe(
+          mockAuthResponse.access_token,
+        );
         expect(service.currentUserValue).toEqual(mockUser);
       });
 
-      const req = httpMock.expectOne('http://localhost:3000/auth/login/fingerprint');
+      const req = httpMock.expectOne(
+        'http://localhost:3000/auth/login/fingerprint',
+      );
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({ fingerprintHash });
 
@@ -93,16 +106,23 @@ describe('AuthService', () => {
 
       const mockRegisterResponse = {
         message: 'User registered successfully',
-        user: mockUser
+        user: mockUser,
       };
 
-      service.register(email, password, firstName, lastName).subscribe(response => {
-        expect(response).toEqual(mockRegisterResponse);
-      });
+      service
+        .register(email, password, firstName, lastName)
+        .subscribe((response) => {
+          expect(response).toEqual(mockRegisterResponse);
+        });
 
       const req = httpMock.expectOne('http://localhost:3000/auth/register');
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({ email, password, firstName, lastName });
+      expect(req.request.body).toEqual({
+        email,
+        password,
+        firstName,
+        lastName,
+      });
 
       req.flush(mockRegisterResponse);
     });
@@ -116,18 +136,22 @@ describe('AuthService', () => {
 
       const mockResponse = {
         message: 'Fingerprint registered successfully',
-        user: mockUser
+        user: mockUser,
       };
 
-      service.registerFingerprint(email, password, fingerprintHash).subscribe(response => {
-        expect(response).toEqual(mockResponse);
-      });
+      service
+        .registerFingerprint(email, password, fingerprintHash)
+        .subscribe((response) => {
+          expect(response).toEqual(mockResponse);
+        });
 
-      const req = httpMock.expectOne('http://localhost:3000/auth/fingerprint/register');
+      const req = httpMock.expectOne(
+        'http://localhost:3000/auth/fingerprint/register',
+      );
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({
         user: { email, password },
-        fingerprint: { fingerprintHash }
+        fingerprint: { fingerprintHash },
       });
 
       req.flush(mockResponse);
@@ -154,16 +178,16 @@ describe('AuthService', () => {
       // First clear storage and configure TestBed
       localStorage.clear();
       TestBed.resetTestingModule();
-      
+
       // Then set up localStorage before creating service
       localStorage.setItem('currentUser', JSON.stringify(mockUser));
-      
+
       // Create new instance of service
       const newService = TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
-        providers: [AuthService]
+        providers: [AuthService],
       }).inject(AuthService);
-      
+
       expect(newService.currentUserValue).toEqual(mockUser);
     });
 
@@ -171,13 +195,13 @@ describe('AuthService', () => {
       // First clear storage and configure TestBed
       localStorage.clear();
       TestBed.resetTestingModule();
-      
+
       // Create new instance of service with empty localStorage
       const newService = TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
-        providers: [AuthService]
+        providers: [AuthService],
       }).inject(AuthService);
-      
+
       expect(newService.currentUserValue).toBeNull();
     });
   });

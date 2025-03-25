@@ -25,14 +25,20 @@ describe('ProfileComponent', () => {
     email: 'test@example.com',
     firstName: 'John',
     lastName: 'Doe',
-    role: UserRole.USER
+    role: UserRole.USER,
   };
 
   beforeEach(async () => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['updateCurrentUser'], {
-      currentUserValue: mockUser
-    });
-    const usersServiceSpy = jasmine.createSpyObj('UsersService', ['updateProfile']);
+    const authServiceSpy = jasmine.createSpyObj(
+      'AuthService',
+      ['updateCurrentUser'],
+      {
+        currentUserValue: mockUser,
+      },
+    );
+    const usersServiceSpy = jasmine.createSpyObj('UsersService', [
+      'updateProfile',
+    ]);
     const snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['open']);
 
     await TestBed.configureTestingModule({
@@ -42,13 +48,13 @@ describe('ProfileComponent', () => {
         MatCardModule,
         MatFormFieldModule,
         MatInputModule,
-        MatButtonModule
+        MatButtonModule,
       ],
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
         { provide: UsersService, useValue: usersServiceSpy },
-        { provide: MatSnackBar, useValue: snackBarSpy }
-      ]
+        { provide: MatSnackBar, useValue: snackBarSpy },
+      ],
     }).compileComponents();
 
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
@@ -70,7 +76,7 @@ describe('ProfileComponent', () => {
     expect(component.profileForm.value).toEqual({
       firstName: mockUser.firstName,
       lastName: mockUser.lastName,
-      email: mockUser.email
+      email: mockUser.email,
     });
   });
 
@@ -78,23 +84,28 @@ describe('ProfileComponent', () => {
     const updatedUserData = {
       firstName: 'Updated',
       lastName: 'User',
-      email: 'updated@example.com'
+      email: 'updated@example.com',
     };
 
     component.profileForm.setValue(updatedUserData);
-    usersService.updateProfile.and.returnValue(of({
-      ...mockUser,
-      ...updatedUserData
-    }));
+    usersService.updateProfile.and.returnValue(
+      of({
+        ...mockUser,
+        ...updatedUserData,
+      }),
+    );
 
     component.onSubmit();
 
-    expect(usersService.updateProfile).toHaveBeenCalledWith(mockUser.id, updatedUserData);
+    expect(usersService.updateProfile).toHaveBeenCalledWith(
+      mockUser.id,
+      updatedUserData,
+    );
     expect(authService.updateCurrentUser).toHaveBeenCalled();
     expect(snackBar.open).toHaveBeenCalledWith(
       'Profile updated successfully',
       'Close',
-      { duration: 3000 }
+      { duration: 3000 },
     );
   });
 
@@ -103,28 +114,28 @@ describe('ProfileComponent', () => {
     component.profileForm.setValue({
       firstName: 'Test',
       lastName: 'User',
-      email: 'test@example.com'
+      email: 'test@example.com',
     });
 
-    usersService.updateProfile.and.returnValue(throwError(() => ({
-      error: { message: errorMessage }
-    })));
+    usersService.updateProfile.and.returnValue(
+      throwError(() => ({
+        error: { message: errorMessage },
+      })),
+    );
 
     component.onSubmit();
 
     expect(usersService.updateProfile).toHaveBeenCalled();
-    expect(snackBar.open).toHaveBeenCalledWith(
-      errorMessage,
-      'Close',
-      { duration: 5000 }
-    );
+    expect(snackBar.open).toHaveBeenCalledWith(errorMessage, 'Close', {
+      duration: 5000,
+    });
   });
 
   it('should not submit form when invalid', () => {
     component.profileForm.setValue({
       firstName: '',
       lastName: 'User',
-      email: 'invalid-email'
+      email: 'invalid-email',
     });
 
     component.onSubmit();

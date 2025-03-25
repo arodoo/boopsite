@@ -9,7 +9,11 @@
       <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>First Name</mat-label>
-          <input matInput formControlName="firstName" placeholder="Enter your first name">
+          <input
+            matInput
+            formControlName="firstName"
+            placeholder="Enter your first name"
+          />
           <mat-error *ngIf="profileForm.get('firstName')?.hasError('required')">
             First name is required
           </mat-error>
@@ -17,7 +21,11 @@
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Last Name</mat-label>
-          <input matInput formControlName="lastName" placeholder="Enter your last name">
+          <input
+            matInput
+            formControlName="lastName"
+            placeholder="Enter your last name"
+          />
           <mat-error *ngIf="profileForm.get('lastName')?.hasError('required')">
             Last name is required
           </mat-error>
@@ -25,7 +33,12 @@
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
-          <input matInput formControlName="email" placeholder="Enter your email" type="email">
+          <input
+            matInput
+            formControlName="email"
+            placeholder="Enter your email"
+            type="email"
+          />
           <mat-error *ngIf="profileForm.get('email')?.hasError('required')">
             Email is required
           </mat-error>
@@ -35,7 +48,12 @@
         </mat-form-field>
 
         <div class="button-row">
-          <button mat-raised-button color="primary" type="submit" [disabled]="!profileForm.valid">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="!profileForm.valid"
+          >
             Save Changes
           </button>
         </div>

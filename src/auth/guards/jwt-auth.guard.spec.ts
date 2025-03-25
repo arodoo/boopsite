@@ -9,7 +9,7 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 jest.mock('@nestjs/passport', () => {
   const originalModule = jest.requireActual('@nestjs/passport');
   const mockCanActivate = jest.fn().mockResolvedValue(true);
-  
+
   class MockAuthGuard {
     constructor(private readonly type: string) {}
     canActivate = mockCanActivate;
@@ -17,7 +17,7 @@ jest.mock('@nestjs/passport', () => {
 
   return {
     ...originalModule,
-    AuthGuard: jest.fn(() => MockAuthGuard)
+    AuthGuard: jest.fn(() => MockAuthGuard),
   };
 });
 
@@ -75,7 +75,7 @@ describe('JwtAuthGuard', () => {
     return {
       switchToHttp: jest.fn().mockReturnValue({
         getRequest: jest.fn().mockReturnValue({
-          user: { id: '1', email: 'test@example.com' }
+          user: { id: '1', email: 'test@example.com' },
         }),
       }),
       getType: jest.fn().mockReturnValue('http'),

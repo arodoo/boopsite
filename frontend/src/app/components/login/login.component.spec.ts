@@ -25,7 +25,7 @@ describe('LoginComponent', () => {
   const mockUser = {
     id: '1',
     email: 'test@example.com',
-    role: UserRole.USER
+    role: UserRole.USER,
   };
 
   beforeEach(async () => {
@@ -118,10 +118,12 @@ describe('LoginComponent', () => {
         password: 'password123',
       };
 
-      authService.login.and.returnValue(of({
-        access_token: 'token',
-        user: mockUser,
-      }));
+      authService.login.and.returnValue(
+        of({
+          access_token: 'token',
+          user: mockUser,
+        }),
+      );
 
       component.loginForm.setValue(credentials);
       component.onLogin();
@@ -131,11 +133,9 @@ describe('LoginComponent', () => {
         credentials.password,
       );
       expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
-      expect(snackBar.open).toHaveBeenCalledWith(
-        'Login successful!',
-        'Close',
-        { duration: 3000 },
-      );
+      expect(snackBar.open).toHaveBeenCalledWith('Login successful!', 'Close', {
+        duration: 3000,
+      });
     });
 
     it('should show error message on login failure', () => {
@@ -144,9 +144,11 @@ describe('LoginComponent', () => {
         password: 'wrongpassword',
       };
 
-      authService.login.and.returnValue(throwError(() => ({
-        error: { message: 'Invalid credentials' },
-      })));
+      authService.login.and.returnValue(
+        throwError(() => ({
+          error: { message: 'Invalid credentials' },
+        })),
+      );
 
       component.loginForm.setValue(credentials);
       component.onLogin();
@@ -166,13 +168,15 @@ describe('LoginComponent', () => {
         password: 'password123',
         confirmPassword: 'password123',
         firstName: 'Test',
-        lastName: 'User'
+        lastName: 'User',
       };
 
-      authService.register.and.returnValue(of({
-        message: 'Registration successful',
-        user: mockUser,
-      }));
+      authService.register.and.returnValue(
+        of({
+          message: 'Registration successful',
+          user: mockUser,
+        }),
+      );
 
       component.registerForm.patchValue(registerData);
       component.onRegister();
@@ -181,7 +185,7 @@ describe('LoginComponent', () => {
         registerData.email,
         registerData.password,
         registerData.firstName,
-        registerData.lastName
+        registerData.lastName,
       );
       expect(snackBar.open).toHaveBeenCalledWith(
         'Registration successful! You can now login.',
@@ -193,10 +197,12 @@ describe('LoginComponent', () => {
 
   describe('Fingerprint Authentication', () => {
     it('should handle fingerprint login', () => {
-      authService.loginWithFingerprint.and.returnValue(of({
-        access_token: 'token',
-        user: mockUser,
-      }));
+      authService.loginWithFingerprint.and.returnValue(
+        of({
+          access_token: 'token',
+          user: mockUser,
+        }),
+      );
 
       component.onFingerprintLogin();
 
@@ -216,10 +222,12 @@ describe('LoginComponent', () => {
       };
 
       component.loginForm.setValue(credentials);
-      authService.registerFingerprint.and.returnValue(of({
-        message: 'Fingerprint registered successfully',
-        user: mockUser,
-      }));
+      authService.registerFingerprint.and.returnValue(
+        of({
+          message: 'Fingerprint registered successfully',
+          user: mockUser,
+        }),
+      );
 
       component.registerFingerprint();
 

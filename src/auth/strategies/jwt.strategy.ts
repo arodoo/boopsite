@@ -7,12 +7,12 @@ import { ConfigService } from '@nestjs/config';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private configService: ConfigService) {
     const secretKey = configService.get<string>('JWT_SECRET');
-    
+
     // Ensure we have a secret key
     if (!secretKey) {
       throw new Error('JWT_SECRET is not defined in environment variables');
     }
-    
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -29,11 +29,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!payload) {
       throw new UnauthorizedException('Invalid token');
     }
-    
-    return { 
-      userId: payload.sub, 
+
+    return {
+      userId: payload.sub,
       email: payload.email,
-      role: payload.role
+      role: payload.role,
     };
   }
 }

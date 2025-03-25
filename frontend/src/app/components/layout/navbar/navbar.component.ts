@@ -11,19 +11,14 @@ import { AuthService } from '../../../services/auth.service';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
   standalone: true,
-  imports: [
-    CommonModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule
-  ]
+  imports: [CommonModule, MatToolbarModule, MatButtonModule, MatIconModule],
 })
 export class NavbarComponent {
   @Output() menuClick = new EventEmitter<void>();
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   toggleMenu() {

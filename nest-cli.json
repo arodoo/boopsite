@@ -5,9 +5,7 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "watchAssets": true,
-    "assets": [
-      "**/*.json"
-    ]
+    "assets": ["**/*.json"]
   },
   "projects": {},
   "monorepo": false,

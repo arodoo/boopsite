@@ -49,8 +49,8 @@ describe('AuthController', () => {
     const createUserDto = {
       email: 'test@example.com',
       password: 'password123',
-      firstName: 'Test',  // Add required fields
-      lastName: 'User'    // Add required fields
+      firstName: 'Test', // Add required fields
+      lastName: 'User', // Add required fields
     };
 
     it('should register a new user successfully', async () => {
@@ -101,7 +101,9 @@ describe('AuthController', () => {
       const result = await controller.loginWithFingerprint(fingerprintDto);
 
       expect(result).toEqual(expectedResponse);
-      expect(mockAuthService.loginWithFingerprint).toHaveBeenCalledWith(fingerprintDto);
+      expect(mockAuthService.loginWithFingerprint).toHaveBeenCalledWith(
+        fingerprintDto,
+      );
     });
   });
 
@@ -124,7 +126,10 @@ describe('AuthController', () => {
       mockAuthService.validateUser.mockResolvedValue(mockUser);
       mockAuthService.registerFingerprint.mockResolvedValue(expectedResponse);
 
-      const result = await controller.registerFingerprint(loginUserDto, fingerprintDto);
+      const result = await controller.registerFingerprint(
+        loginUserDto,
+        fingerprintDto,
+      );
 
       expect(result).toEqual(expectedResponse);
       expect(mockAuthService.validateUser).toHaveBeenCalledWith(
@@ -140,7 +145,10 @@ describe('AuthController', () => {
     it('should return error when credentials are invalid', async () => {
       mockAuthService.validateUser.mockResolvedValue(null);
 
-      const result = await controller.registerFingerprint(loginUserDto, fingerprintDto);
+      const result = await controller.registerFingerprint(
+        loginUserDto,
+        fingerprintDto,
+      );
 
       expect(result).toEqual({
         success: false,

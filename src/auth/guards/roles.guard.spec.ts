@@ -39,13 +39,15 @@ describe('RolesGuard', () => {
 
     expect(reflector.getAllAndOverride).toHaveBeenCalledWith(ROLES_KEY, [
       context.getHandler(),
-      context.getClass()
+      context.getClass(),
     ]);
     expect(result).toBe(true);
   });
 
   it('should allow access when user has required role', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([UserRole.ADMIN]);
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue([UserRole.ADMIN]);
 
     const context = createMockContext({ role: UserRole.ADMIN });
     const result = guard.canActivate(context);
@@ -54,7 +56,9 @@ describe('RolesGuard', () => {
   });
 
   it('should deny access when user does not have required role', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([UserRole.ADMIN]);
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue([UserRole.ADMIN]);
 
     const context = createMockContext({ role: UserRole.USER });
     const result = guard.canActivate(context);
@@ -63,7 +67,9 @@ describe('RolesGuard', () => {
   });
 
   it('should work with multiple roles', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([UserRole.ADMIN, UserRole.USER]);
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue([UserRole.ADMIN, UserRole.USER]);
 
     // User with USER role should be allowed
     const userContext = createMockContext({ role: UserRole.USER });

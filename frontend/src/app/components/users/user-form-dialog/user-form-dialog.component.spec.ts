@@ -1,7 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -20,7 +24,7 @@ describe('UserFormDialogComponent', () => {
     email: 'user@example.com',
     firstName: 'Test',
     lastName: 'User',
-    role: UserRole.USER
+    role: UserRole.USER,
   };
 
   beforeEach(async () => {
@@ -34,12 +38,12 @@ describe('UserFormDialogComponent', () => {
         MatFormFieldModule,
         MatInputModule,
         MatSelectModule,
-        MatButtonModule
+        MatButtonModule,
       ],
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
-        { provide: MAT_DIALOG_DATA, useValue: null } // Start with no user data for create mode
-      ]
+        { provide: MAT_DIALOG_DATA, useValue: null }, // Start with no user data for create mode
+      ],
     }).compileComponents();
   });
 
@@ -66,13 +70,13 @@ describe('UserFormDialogComponent', () => {
     it('should require password in create mode', () => {
       const passwordControl = component.userForm.get('password');
       expect(passwordControl?.hasValidator).toBeTruthy();
-      
+
       passwordControl?.setValue('');
       expect(passwordControl?.valid).toBeFalsy();
-      
+
       passwordControl?.setValue('123');
       expect(passwordControl?.valid).toBeFalsy(); // Too short
-      
+
       passwordControl?.setValue('password123');
       expect(passwordControl?.valid).toBeTruthy();
     });
@@ -83,19 +87,19 @@ describe('UserFormDialogComponent', () => {
         firstName: 'New',
         lastName: 'User',
         role: UserRole.USER,
-        password: 'password123'
+        password: 'password123',
       };
-      
+
       component.userForm.setValue(formData);
       component.onSubmit();
-      
+
       expect(mockDialogRef.close).toHaveBeenCalledWith(formData);
     });
 
     it('should not submit when form is invalid', () => {
       component.userForm.get('email')?.setValue('invalid-email');
       component.onSubmit();
-      
+
       expect(mockDialogRef.close).not.toHaveBeenCalled();
     });
   });
@@ -110,14 +114,14 @@ describe('UserFormDialogComponent', () => {
           MatFormFieldModule,
           MatInputModule,
           MatSelectModule,
-          MatButtonModule
+          MatButtonModule,
         ],
         providers: [
           { provide: MatDialogRef, useValue: mockDialogRef },
-          { provide: MAT_DIALOG_DATA, useValue: existingUser }
-        ]
+          { provide: MAT_DIALOG_DATA, useValue: existingUser },
+        ],
       }).compileComponents();
-      
+
       fixture = TestBed.createComponent(UserFormDialogComponent);
       component = fixture.componentInstance;
       fixture.detectChanges();
@@ -130,8 +134,12 @@ describe('UserFormDialogComponent', () => {
 
     it('should initialize form with existing user data in edit mode', () => {
       expect(component.userForm.get('email')?.value).toBe(existingUser.email);
-      expect(component.userForm.get('firstName')?.value).toBe(existingUser.firstName);
-      expect(component.userForm.get('lastName')?.value).toBe(existingUser.lastName);
+      expect(component.userForm.get('firstName')?.value).toBe(
+        existingUser.firstName,
+      );
+      expect(component.userForm.get('lastName')?.value).toBe(
+        existingUser.lastName,
+      );
       expect(component.userForm.get('role')?.value).toBe(existingUser.role);
       // Password should be empty in edit mode
       expect(component.userForm.get('password')?.value).toBe('');
@@ -148,15 +156,15 @@ describe('UserFormDialogComponent', () => {
         firstName: 'Updated',
         lastName: 'User',
         role: UserRole.ADMIN,
-        password: '' // Empty password should be excluded
+        password: '', // Empty password should be excluded
       };
-      
+
       component.userForm.setValue(updatedData);
       component.onSubmit();
-      
+
       const expectedData: Partial<typeof updatedData> = { ...updatedData };
       delete expectedData.password;
-      
+
       expect(mockDialogRef.close).toHaveBeenCalledWith(expectedData);
     });
 
@@ -166,12 +174,12 @@ describe('UserFormDialogComponent', () => {
         firstName: 'Updated',
         lastName: 'User',
         role: UserRole.ADMIN,
-        password: 'newpassword123'
+        password: 'newpassword123',
       };
-      
+
       component.userForm.setValue(updatedData);
       component.onSubmit();
-      
+
       expect(mockDialogRef.close).toHaveBeenCalledWith(updatedData);
     });
 

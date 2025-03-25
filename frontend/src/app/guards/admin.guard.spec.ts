@@ -13,18 +13,18 @@ describe('AdminGuard', () => {
   const adminUser = {
     id: '1',
     email: 'admin@example.com',
-    role: UserRole.ADMIN
+    role: UserRole.ADMIN,
   };
 
   const regularUser = {
     id: '2',
     email: 'user@example.com',
-    role: UserRole.USER
+    role: UserRole.USER,
   };
 
   beforeEach(() => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', [], {
-      currentUserValue: regularUser
+      currentUserValue: regularUser,
     });
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -32,8 +32,8 @@ describe('AdminGuard', () => {
       providers: [
         AdminGuard,
         { provide: AuthService, useValue: authServiceSpy },
-        { provide: Router, useValue: routerSpy }
-      ]
+        { provide: Router, useValue: routerSpy },
+      ],
     });
 
     guard = TestBed.inject(AdminGuard);
@@ -48,7 +48,7 @@ describe('AdminGuard', () => {
   it('should allow access to admin users', () => {
     // Set current user to admin
     Object.defineProperty(authService, 'currentUserValue', {
-      get: () => adminUser
+      get: () => adminUser,
     });
 
     expect(guard.canActivate()).toBe(true);
@@ -64,7 +64,7 @@ describe('AdminGuard', () => {
   it('should block access when no user is authenticated', () => {
     // Set current user to null (not authenticated)
     Object.defineProperty(authService, 'currentUserValue', {
-      get: () => null
+      get: () => null,
     });
 
     expect(guard.canActivate()).toBe(false);

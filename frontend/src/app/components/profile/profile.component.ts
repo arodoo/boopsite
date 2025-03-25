@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -21,8 +26,8 @@ import { User } from '../../models/user.model';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
-  ]
+    MatButtonModule,
+  ],
 })
 export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
@@ -32,12 +37,12 @@ export class ProfileComponent implements OnInit {
     private fb: FormBuilder,
     private usersService: UsersService,
     private authService: AuthService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {
     this.profileForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.email]],
     });
   }
 
@@ -47,23 +52,30 @@ export class ProfileComponent implements OnInit {
       this.profileForm.patchValue({
         firstName: this.currentUser.firstName || '',
         lastName: this.currentUser.lastName || '',
-        email: this.currentUser.email
+        email: this.currentUser.email,
       });
     }
   }
 
   onSubmit(): void {
     if (this.profileForm.valid && this.currentUser) {
-      this.usersService.updateProfile(this.currentUser.id, this.profileForm.value)
+      this.usersService
+        .updateProfile(this.currentUser.id, this.profileForm.value)
         .subscribe({
           next: (updatedUser) => {
-            this.snackBar.open('Profile updated successfully', 'Close', { duration: 3000 });
+            this.snackBar.open('Profile updated successfully', 'Close', {
+              duration: 3000,
+            });
             // Update local user data
             this.authService.updateCurrentUser(updatedUser);
           },
           error: (error) => {
-            this.snackBar.open(error.error.message || 'Failed to update profile', 'Close', { duration: 5000 });
-          }
+            this.snackBar.open(
+              error.error.message || 'Failed to update profile',
+              'Close',
+              { duration: 5000 },
+            );
+          },
         });
     }
   }

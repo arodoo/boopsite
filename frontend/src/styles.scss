@@ -2,10 +2,11 @@
 @use '@angular/material' as mat;
 
 /* Reset default styles */
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
 /* Import Angular Material theme */
@@ -13,7 +14,7 @@ html, body {
 
 /* Add your global styles below */
 .mat-typography {
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
 /* Fix for Material Icons */

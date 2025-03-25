@@ -5,7 +5,9 @@
         <mat-icon>account_circle</mat-icon>
       </div>
       <mat-card-title>Welcome to the Dashboard</mat-card-title>
-      <mat-card-subtitle *ngIf="currentUser">{{ currentUser.email }}</mat-card-subtitle>
+      <mat-card-subtitle *ngIf="currentUser">{{
+        currentUser.email
+      }}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       <p>You have successfully logged in to the system.</p>

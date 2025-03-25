@@ -1,6 +1,17 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Inject } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Inject,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginUserDto, FingerprintDto, CreateUserDto } from '../users/dto/user.dto';
+import {
+  LoginUserDto,
+  FingerprintDto,
+  CreateUserDto,
+} from '../users/dto/user.dto';
 import { UsersService } from '../users/users.service';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
@@ -11,7 +22,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
   /**
@@ -44,22 +55,22 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginUserDto: LoginUserDto) {
-    this.logger.info('Login request received', { 
+    this.logger.info('Login request received', {
       email: loginUserDto.email,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
     try {
       const result = await this.authService.login(loginUserDto);
       this.logger.info('Login successful', {
         email: loginUserDto.email,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       return result;
     } catch (error) {
       this.logger.error('Login failed', {
         email: loginUserDto.email,
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       throw error;
     }
@@ -94,11 +105,11 @@ export class AuthController {
       loginUserDto.email,
       loginUserDto.password,
     );
-    
+
     if (!validatedUser) {
       return { success: false, message: 'Invalid credentials' };
     }
-    
+
     // Then register the fingerprint
     return this.authService.registerFingerprint(
       loginUserDto.email,
